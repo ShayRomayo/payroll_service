@@ -1,0 +1,23 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Access Employees</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<!--<table th:object="${employees}" id="userTable" border="1">-->
+<!--    <tr th:each="employee :${employees}">-->
+<!--        <a th:href="@{/${employee.getId()}}">-->
+<!--            <td  th:text="${employee.getName()}"></td>-->
+<!--        </a>-->
+<!--    </tr>-->
+<!--</table>-->
+ Possible implementation of lists (TO BE EXPLORED)
+<h1>Result</h1>
+<ul>
+        <li th:each="employee :${employees}" id="employeeList" th:text="${employee.getName()}"
+            th:href="${employee.getId()}">
+        </li>
+</ul>
+</body>
+</html>
