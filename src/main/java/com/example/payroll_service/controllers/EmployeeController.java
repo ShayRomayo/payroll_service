@@ -13,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -23,6 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Controller
 public class EmployeeController {
 
+    private final static Logger LOGGER = Logger.getLogger(EmployeeController.class.getName());
     private final EmployeeRepository repository;
     private final EmployeeModelAssembler assembler;
 
@@ -31,7 +34,9 @@ public class EmployeeController {
         this.assembler = assembler;
     }
 
-    // Old method used as RestController for implementation with old methods used for home page
+    // Old method used as RestController to maintain proper link relations in repository
+    @ResponseBody
+    @RequestMapping("/employees")
     public CollectionModel<EntityModel<Employee>> all() {
         List<EntityModel<Employee>> employees = repository.findAll().stream()
                 .map(assembler::toModel)
@@ -44,34 +49,43 @@ public class EmployeeController {
     // New Get Mapping to actually display employees using template HTML
     @GetMapping("/employees")
     public String all(Model model) {
-        List<EntityModel<Employee>> models = repository.findAll().stream()
-                .map(assembler::toModel)
-                .collect(Collectors.toList());
-
-        ArrayList<Employee> employees = new ArrayList<>();
-        for (EntityModel<Employee> e : models) {
-            employees.add(e.getContent());
-        }
+        List<Employee> employees = repository.findAll();
         model.addAttribute("employees", employees);
+        model.addAttribute("newEmployee", new Employee());
 
-//        return new CollectionModel<>(employees,
-//                linkTo(methodOn(EmployeeController.class).all()).withSelfRel());
         return "employees";
     }
 
-    @GetMapping("/employees/{id}")
+    @ResponseBody
+    @RequestMapping("/employees/{id}")
     public EntityModel<Employee> one(@PathVariable Long id) {
         return assembler.toModel(repository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id)));
     }
 
-    @PostMapping("/employees")
-    public ResponseEntity<?> newEmployee(@RequestBody Employee newEmployee) throws URISyntaxException {
-        EntityModel<Employee> model = assembler.toModel(repository.save(newEmployee));
+    @GetMapping("/employees/{id}")
+    public String one(@PathVariable Long id, Model model) {
+        Optional<Employee> checkEmployee = repository.findById(id);
+        Employee employee;
+        if (checkEmployee.isPresent()) {
+            employee = checkEmployee.get();
+            model.addAttribute("name", employee.getFirstName() + " " + employee.getLastName());
+            model.addAttribute("role", employee.getRole());
+            model.addAttribute("id", employee.getId());
+        } else {
+            model.addAttribute("name", "foo bar");
+            model.addAttribute("role", "cat");
+            model.addAttribute("id", -1);
+        }
 
-        return ResponseEntity
-                .created(model.getRequiredLink(IanaLinkRelations.SELF).toUri())
-                .body(model);
+        return "employees-id";
+    }
+
+    @PostMapping("/employees")
+    public String newEmployee(@ModelAttribute Employee newEmployee) throws URISyntaxException {
+        repository.save(newEmployee);
+
+        return "redirect:/employees";
     }
 
     @PutMapping("/employees/{id}")

@@ -1,14 +1,13 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Access Payroll Service</title>
+    <title>Access an Employee</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
 </head>
 <body>
-<a th:href="${employees}">
-    <p th:text="${employees}" />
-</a>
-<p th:text="${orders}"/>
+<h1 th:text="${name}"></h1>
+<h2 th:text="'Role: ' + ${role}"></h2>
+<h2 th:text="'Id: ' + ${id}"></h2>
 </body>
 </html>

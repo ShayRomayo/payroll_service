@@ -19,7 +19,7 @@ public class RootController {
         model.addAttribute("employees",
                 rootModel.getRequiredLink("employees").getHref());
         model.addAttribute("orders",
-                rootModel.getRequiredLink("employees").getHref());
+                rootModel.getRequiredLink("orders").getHref());
         return "index";
     }
 }

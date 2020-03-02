@@ -3,21 +3,24 @@
 <head>
     <title>Access Employees</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
 </head>
 <body>
-<!--<table th:object="${employees}" id="userTable" border="1">-->
-<!--    <tr th:each="employee :${employees}">-->
-<!--        <a th:href="@{/${employee.getId()}}">-->
-<!--            <td  th:text="${employee.getName()}"></td>-->
-<!--        </a>-->
-<!--    </tr>-->
-<!--</table>-->
- Possible implementation of lists (TO BE EXPLORED)
-<h1>Result</h1>
-<ul>
-        <li th:each="employee :${employees}" id="employeeList" th:text="${employee.getName()}"
-            th:href="${employee.getId()}">
+    <h1>Result</h1>
+    <ul id="employeeList">
+        <li th:each="employee :${employees}" >
+            <a th:text="${employee.getName()}"
+               th:href="@{/employees/{id}(id=${employee.getId()})}">
+            </a>
         </li>
-</ul>
+    </ul>
+
+    <h1>Form</h1>
+    <form action="#" th:action="@{/employees}" th:object="${newEmployee}"
+          method="post">
+        <p>Name: <input type="text" th:field="*{name}" /></p>
+        <p>Role: <input type="text" th:field="*{role}" /></p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
+    </form>
 </body>
 </html>
